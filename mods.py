@@ -9,6 +9,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from prettytable import PrettyTable
 from time import time
 import parse
+from datetime import datetime
+
+from utils import parse_args
 
 class Status():
     
@@ -36,21 +39,12 @@ class Status():
                         'inspire': 'Inspire',
                         'yolo': 'YOLO'}
         
-    
-    def parse_args(self, msg):
-        # Get the argument pairs in a list
-        args = list(map(lambda x: x.strip(), msg[len(msg.split()[0]):].split(',')))
-        # Parse the arguments into a list of dicts
-        args = list(map(lambda x: parse.parse('{col}={val}', x), args))
         
-        return args
-        
-    
     def query(self, msg):
         '''Query and Filter entries in Content Sheet'''
         
         # Parse the input text into a list of dicts
-        args = self.parse_args(msg)
+        args = parse_args(msg)
         
         # Get the worksheet
         sheet = self.db.get_worksheet(0)
@@ -89,7 +83,7 @@ class Status():
         '''Add a new row in the content sheet'''
         
         # Parse the input text into a list of dicts
-        args = self.parse_args(msg)
+        args = parse_args(msg)
         
         # Convert the args list into a dictionary
         try:
@@ -136,7 +130,7 @@ class Status():
         '''Update the status of a titled piece'''
         
         # Parse the input text into a list of dicts
-        args = self.parse_args(msg)
+        args = parse_args(msg)
         
         try:
             args_map = {}
@@ -170,4 +164,34 @@ class Status():
         response_string = f"**Status Updated**\n```\n{table}\n```"
         
         return response_string
+        
+        
+class Funnel():
+    
+    def __init__(self):
+        pass
+    
+    def remind(self, msg):
+        '''Returns the sleep time in seconds with the parsed reminder message'''
+        args = parse_args(msg)
+        
+        try:
+            args_map = {}
+            for arg in args:
+                if arg['col'] == 'time':
+                    args_map['time'] = arg['val'].strip()
+                elif arg['col'] == 'msg':
+                    args_map['msg'] = arg['val'].strip()
+                    
+            if len(args_map) < 2:
+                return -1, "That command doesn't seem right!"
+            
+            t_remind = datetime.strptime(args_map['time'], "%d-%m-%Y %H:%M")
+            t_delta = (t_remind - datetime.now()).seconds + 5
+
+            return t_delta, args_map
+        
+        except:
+            return -1, "That command doesn't seem right! Check if the date-time format is correct"
+        
         

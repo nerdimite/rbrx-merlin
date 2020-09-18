@@ -1,13 +1,16 @@
 import discord
 import numpy as np
 import asyncio
-from mods import Status
+from mods import Status, Funnel
 
 # Init Discord
 client = discord.Client()
 
-# Init Content Query
+# Init Status Mod
 status = Status()
+
+# Init Funnel Mod
+funnel = Funnel()
 
 print("Listening...")
 
@@ -18,6 +21,9 @@ async def on_message(msg):
 
     if msg.author == client.user:
         return
+    
+    if msg.content.startswith('mh'):
+        await msg.channel.send(f"Hello {msg.author.mention}!")
 
     # ===== STATUS =====
     if msg.content.startswith("query") or msg.content.startswith("q"):
@@ -36,15 +42,19 @@ async def on_message(msg):
         await msg.channel.send(response)
         
     # ===== FUNNEL =====
-    elif msg.content.startswith("remind"):
-        time = msg.content.split()[1]
-        await msg.channel.send(f"Reminder set for {time} seconds")
+    elif msg.content.startswith("remind") or msg.content.startswith("r"):
         
-        await asyncio.sleep(int(time))
+        t_delta, args = funnel.remind(msg.content)
         
-        await msg.channel.send("Time elapsed")
-        
-        
-    
+        if t_delta != -1:
+            await msg.channel.send(f"Will remind you to \"{args['msg']}\" at {args['time']}")
 
+            print(t_delta)
+            await asyncio.sleep(int(t_delta))
+
+            await msg.channel.send(f"**Reminder:** {args['msg']}")
+        else:
+            await msg.channel.send(args)
+            
+            
 client.run('NzQ4NDUxMjk0OTIyMTQ1ODEz.X0dnlg.dpUItPEVNDflzXXHJhhcPEvVufU')
