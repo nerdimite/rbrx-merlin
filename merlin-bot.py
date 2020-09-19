@@ -22,27 +22,27 @@ async def on_message(msg):
     if msg.author == client.user:
         return
     
-    if msg.content.startswith('mh'):
+    if msg.content.startswith('--mh'):
         await msg.channel.send(f"Hello {msg.author.mention}!")
 
     # ===== STATUS =====
-    if msg.content.startswith("query") or msg.content.startswith("q"):
+    if msg.content.startswith("--query") or msg.content.startswith("--q"):
         response = status.query(msg.content)
         print(response)
         await msg.channel.send(response)
         
-    elif msg.content.startswith("add") or msg.content.startswith("a"):
+    elif msg.content.startswith("--add") or msg.content.startswith("--a"):
         response = status.add(msg.content)
         print(response)
         await msg.channel.send(response)
         
-    elif msg.content.startswith("update") or msg.content.startswith("u"):
+    elif msg.content.startswith("--update") or msg.content.startswith("--u"):
         response = status.update(msg.content)
         print(response)
         await msg.channel.send(response)
         
     # ===== FUNNEL =====
-    elif msg.content.startswith("remind") or msg.content.startswith("r"):
+    elif msg.content.startswith("--remind") or msg.content.startswith("--r"):
         
         t_delta, args = funnel.remind(msg.content)
         
