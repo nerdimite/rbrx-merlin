@@ -10,6 +10,7 @@ from prettytable import PrettyTable
 from time import time
 import parse
 from datetime import datetime
+from pytz import timezone
 
 from utils import parse_args
 
@@ -187,7 +188,8 @@ class Funnel():
                 return -1, "That command doesn't seem right!"
             
             t_remind = datetime.strptime(args_map['time'], "%d-%m-%Y %H:%M")
-            t_delta = (t_remind - datetime.now()).seconds + 5
+            now = datetime.now(timezone('UTC')).astimezone(timezone('Asia/Kolkata'))
+            t_delta = (t_remind - now).seconds + 5
 
             return t_delta, args_map
         
