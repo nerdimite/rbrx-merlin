@@ -54,7 +54,7 @@ class Status():
         data = sheet.get_all_values()[1:]
         
         # Create a dataframe
-        df = pd.DataFrame(np.array(data)[:, :-1], columns=['name', 'title', 'status', 'category'])
+        df = pd.DataFrame(np.array(data), columns=['name', 'title', 'status', 'category'])
         
         try:
             for arg in args:
