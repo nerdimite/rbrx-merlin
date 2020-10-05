@@ -12,49 +12,65 @@ status = Status()
 # Init Funnel Mod
 funnel = Funnel()
 
-print("Listening...")
+print("Listening...")    
 
 @client.event
-async def on_message(msg):
+async def on_message(ctx):
     # Get message
-    msg.content = msg.content.lower()
+#     ctx.content = ctx.content.lower()
 
-    if msg.author == client.user:
+    if ctx.author == client.user:
         return
     
-    if msg.content.startswith('--mh'):
-        await msg.channel.send(f"Hello {msg.author.mention}!")
+    if ctx.content.startswith('--mh'):
+        print('MH', ctx.content)
+        await ctx.channel.send(f"Mentioning <@&747703681985544202> and <@&747703676587737229>")
 
     # ===== STATUS =====
-    if msg.content.startswith("--query") or msg.content.startswith("--q"):
-        response = status.query(msg.content)
+    if ctx.content.startswith("--query") or ctx.content.startswith("--q"):
+        response = status.query(ctx.content.lower())
         print(response)
-        await msg.channel.send(response)
+        await ctx.channel.send(response)
         
-    elif msg.content.startswith("--add") or msg.content.startswith("--a"):
-        response = status.add(msg.content)
+    elif ctx.content.startswith("--add") or ctx.content.startswith("--a"):
+        response = status.add(ctx.content)
         print(response)
-        await msg.channel.send(response)
+        await ctx.channel.send(response)
         
-    elif msg.content.startswith("--update") or msg.content.startswith("--u"):
-        response = status.update(msg.content)
+    elif ctx.content.startswith("--update") or ctx.content.startswith("--u"):
+        response = status.update(ctx.content.lower())
         print(response)
-        await msg.channel.send(response)
+        await ctx.channel.send(response)
         
     # ===== FUNNEL =====
-    elif msg.content.startswith("--remind") or msg.content.startswith("--r"):
+    # Basic Reminder
+    elif ctx.content.startswith("--remind") or ctx.content.startswith("--r"):
         
-        t_delta, args = funnel.remind(msg.content)
+        t_delta, args = funnel.remind(ctx.content)
         
         if t_delta != -1:
-            await msg.channel.send(f"Will remind you to \"{args['msg']}\" at {args['time']}")
+            await ctx.channel.send(f"Will remind you to \"{args['msg']}\" at {args['time']}")
 
-            print(t_delta)
+            print('Timeout for', t_delta, 'seconds')
             await asyncio.sleep(int(t_delta))
+            print('Timeout Complete')
 
-            await msg.channel.send(f"**Reminder:** {args['msg']}")
+            await ctx.channel.send(f"**Reminder:** {args['msg']}")
         else:
-            await msg.channel.send(args)
-            
-            
+            await ctx.channel.send(args)
+    
+    # Reminder Scheduler
+    elif ctx.content.startswith("--sa"):
+        
+        # Add to schedule and extract datetime objects
+        response, timestamps, post_details = funnel.add_schedule(ctx.content)
+        
+        if timestamps != -1 and post_details != -1:
+            await ctx.channel.send(response)
+            # Schedule reminder routines
+            await funnel.schedule_reminders(ctx, timestamps, post_details)
+        else:
+            await ctx.channel.send(response)
+        
+        
 client.run('NzQ4NDUxMjk0OTIyMTQ1ODEz.X0dnlg.dpUItPEVNDflzXXHJhhcPEvVufU')
