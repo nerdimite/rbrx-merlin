@@ -216,7 +216,7 @@ class Funnel():
                 elif col == 'date':
                     date_str = f"{val} 10:00"
                     
-                    post_date = datetime.strptime(date_str, "%d-%m-%Y %H:%M").astimezone(timezone('Asia/Kolkata'))
+                    post_date = datetime.strptime(date_str, "%d-%m-%Y %H:%M")
                     s1_date = post_date - timedelta(days=1, hours=-8)
                     s2_date = post_date + timedelta(hours=4)
                     
@@ -286,7 +286,14 @@ class Funnel():
         # Timeline: post_r1 -> post_r2 -> s1_r -> s2_r        
         for rmdr, resps in zip([post_r1, post_r2, s1_r, s2_r], rmdr_resps):
             # Get the ETA in seconds
-            now = datetime.now(timezone('UTC')).astimezone(timezone('Asia/Kolkata'))
+            now = datetime.now() + timedelta(hours=5, minutes=30)
+            
+            # Check if now is less than rmdr
+            if now > rmdr:
+                print('rmdr is now in the past, so skipping this rmdr')
+                continue
+            
+            # Get the t_delta in seconds
             delta = (rmdr - now).seconds + 5
             # Log
             print(f'Reminder for {title} at {str(rmdr)} in {delta} seconds')
