@@ -51,7 +51,6 @@ async def on_message(ctx):
             await ctx.channel.send(f"Will remind you to \"{args['msg']}\" at {args['time']}")
 
             print('Timeout for', t_delta, 'seconds')
-            await ctx.channel.send(f"*[Log]* Asyncio Sleep for {t_delta} seconds")
             await asyncio.sleep(int(t_delta))
             print('Timeout Complete')
 
