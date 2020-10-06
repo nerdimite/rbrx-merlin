@@ -312,8 +312,8 @@ class Funnel():
             if len(args_map) < 2:
                 return -1, "That command doesn't seem right!"
             
-            t_remind = datetime.strptime(args_map['time'], "%d-%m-%Y %H:%M").astimezone(timezone('UTC')).astimezone(timezone('Asia/Kolkata'))
-            now = datetime.now(timezone('UTC')).astimezone(timezone('Asia/Kolkata'))
+            t_remind = datetime.strptime(args_map['time'], "%d-%m-%Y %H:%M").astimezone(timezone('UTC'))
+            now = datetime.now(timezone('UTC'))
             t_delta = (t_remind - now).seconds + 5
 
             return t_delta, args_map
