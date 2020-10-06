@@ -1,5 +1,4 @@
 import discord
-import numpy as np
 import asyncio
 from mods import Status, Funnel
 
@@ -24,7 +23,7 @@ async def on_message(ctx):
     
     if ctx.content.startswith('--mh'):
         print('MH', ctx.content)
-        await ctx.channel.send(f"Mentioning <@&747703681985544202> and <@&747703676587737229>")
+        await ctx.channel.send("Mentioning <@&747703681985544202> and <@&747703676587737229>")
 
     # ===== STATUS =====
     if ctx.content.startswith("--query") or ctx.content.startswith("--q"):
