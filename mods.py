@@ -286,7 +286,8 @@ class Funnel():
         # Timeline: post_r1 -> post_r2 -> s1_r -> s2_r
         for rmdr, resps in zip([post_r1, post_r2, s1_r, s2_r], rmdr_resps):
             # Get the ETA in seconds
-            now = datetime.now() + timedelta(hours=5, minutes=30)
+            # now = datetime.now() + timedelta(hours=5, minutes=30)
+            now = datetime.now()
 
             # Check if now is less than rmdr
             if now > rmdr:
@@ -296,13 +297,13 @@ class Funnel():
             # Get the t_delta in seconds
             delta = (rmdr - now).seconds + 5
             # Log
-            print(f'Reminder for {title} at {str(rmdr)} in {delta} seconds')
+            print(f'Reminder on {title} at {str(rmdr)} in {delta} seconds')
             # Sleep
             await asyncio.sleep(int(delta))
             # Remind
             await ctx.channel.send(f"**Reminder:** The {resps[0]} on \"{title}\" ({category}) \
                                     needs to be published in {resps[1]} Hours. {writer} {designer}")
-            
+
 
     def remind(self, msg):
         '''Returns the sleep time in seconds with the parsed reminder message'''
@@ -321,7 +322,8 @@ class Funnel():
 
             t_remind = datetime.strptime(args_map['time'], "%d-%m-%Y %H:%M")
             print('t_remind:', t_remind)
-            now = datetime.now() + timedelta(hours=5, minutes=30)
+            # now = datetime.now() + timedelta(hours=5, minutes=30)
+            now = datetime.now()
             print('now:', now)
             t_delta = (t_remind - now).seconds + 5
 

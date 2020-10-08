@@ -1,0 +1,21 @@
+=======================
+Project Version History
+=======================
+
+Project Name: Merlin
+Purpose: Discord Bot for Rubrix
+Author: Bhavesh Laddagiri
+
+Version 0.1 (19-09-2020)
+    - Content Sheet Query
+    - Add to Sheet
+    - Update Status
+
+Version 0.2 (04-10-2020)
+    - Basic Reminder
+
+Version 0.3 (06-10-2020)
+    - Automatic Reminder Scheduling
+
+Version 0.4 (08-10-2020)
+    - Migrated the Code to bot.command extension
