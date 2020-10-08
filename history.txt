@@ -19,3 +19,4 @@ Version 0.3 (06-10-2020)
 
 Version 0.4 (08-10-2020)
     - Migrated the Code to bot.command extension
+    - Migrated the server to raspberry pi
