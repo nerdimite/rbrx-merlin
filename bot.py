@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 from mods import Status, Funnel
+import os
 
 # Init Discord
 intents = discord.Intents.default()
@@ -73,4 +74,5 @@ async def test(ctx):
 
 # =================================
 # Run the bot
-bot.run('NzQ4NDUxMjk0OTIyMTQ1ODEz.X0dnlg.dpUItPEVNDflzXXHJhhcPEvVufU')
+token = os.environ['DISCORD']
+bot.run(token)
