@@ -296,8 +296,8 @@ class Scheduler():
             # Sort reminders
             reminders_ts.sort()
             
-            print('[TS]', reminders_ts)
-            print('[MAP]',reminders_map)
+            print('\n[TS]', reminders_ts)
+            print('\n[MAP]',reminders_map)
             
             # Current timestamp
             now = datetime.now().replace(second=0, microsecond=0) + timedelta(hours=5, minutes=30)
@@ -307,7 +307,7 @@ class Scheduler():
             
             # Check if current time is equal to reminder time
             if now == reminders_ts[0]:
-                print(f'Reminding Now at {reminders_ts[0]}')
+                print(f'\nReminding Now at {reminders_ts[0]}')
                 
                 response_string = f"**Reminder**\n```\n> Content-Type = {meta[2]}\
                                                      \n> Title        = {meta[1]}\
