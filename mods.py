@@ -280,7 +280,7 @@ class Scheduler():
         
         while(1):
             # Pre-Sleep
-            await asyncio.sleep(50)
+            await asyncio.sleep(45)
             
             # Load reminders
             try:
@@ -304,13 +304,13 @@ class Scheduler():
             
             # Check if current time is equal to reminder time
             if now == reminders_ts[0]:
-                print('Reminding Now...')
+                print(f'Reminding Now at {reminders_ts[0]}')
                 
                 response_string = f"**Reminder**\n```\n> Content-Type = {meta[2]}\
-                                                      \n> Title        = {meta[1]}\
-                                                      \n> Category     = {meta[0]}\
-                                                      \n> Timestamp    = {meta[3]}\
-                                                      \n``` {writer} {designer}"
+                                                     \n> Title        = {meta[1]}\
+                                                     \n> Category     = {meta[0]}\
+                                                     \n> Publish On   = {meta[3]}\
+                                                     \n``` {writer} {designer}"
                 
                 print(response_string)
                 await channel.send(response_string)
@@ -322,7 +322,8 @@ class Scheduler():
                 print(f"**Skipping the Reminder**\n```\n> Content-Type = {meta[2]}\
                                                       \n> Title        = {meta[1]}\
                                                       \n> Category     = {meta[0]}\
-                                                      \n> Timestamp    = {meta[3]}\
+                                                      \n> Publish On   = {meta[3]}\
+                                                      \n> Reminder     = {reminders_ts[0]}\
                                                       \n```")
                 remove_save(reminders_ts, reminders_map)
 
