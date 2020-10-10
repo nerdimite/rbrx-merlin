@@ -297,7 +297,7 @@ class Scheduler():
             reminders_ts.sort()
             
             # Current timestamp
-            now = datetime.now().replace(second=0, microsecond=0) # + timedelta(hours=5, minutes=30)
+            now = datetime.now().replace(second=0, microsecond=0) + timedelta(hours=5, minutes=30)
             
             # Check if current time is equal to reminder time
             if now == reminders_ts[0]:
