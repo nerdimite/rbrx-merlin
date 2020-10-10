@@ -296,6 +296,9 @@ class Scheduler():
             # Sort reminders
             reminders_ts.sort()
             
+            print('[TS]', reminders_ts)
+            print('[MAP]',reminders_map)
+            
             # Current timestamp
             now = datetime.now().replace(second=0, microsecond=0) + timedelta(hours=5, minutes=30)
             
