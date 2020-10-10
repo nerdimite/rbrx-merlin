@@ -224,7 +224,8 @@ class Scheduler():
             print(e)
             return "That command doesn't seem right?!", -1, -1
 
-        values = list(add_info.values())
+        df = pd.DataFrame(columns=['category', 'title', 'story 1', 'post', 'story 2'])
+        values = df.append(add_info, ignore_index=True).fillna('').values.tolist()[0]
 
         # Create a formatted response string
         response_string = f'**Added to schedule and reminders are set**\n```\n> Category = {values[0]}\
