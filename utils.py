@@ -44,5 +44,5 @@ def update_reminders(obj, filename='reminders.pkl'):
 def remove_save(reminders_ts, reminders_map):
     '''Remove the first element with the corresponding key-value pair and save it'''
     reminders_ts.remove(reminders_ts[0])
-    reminders_map.pop(reminders_ts[0])
+#     reminders_map.pop(reminders_ts[0])
     save_reminders((reminders_ts, reminders_map))
