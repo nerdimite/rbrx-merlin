@@ -284,8 +284,10 @@ class Scheduler():
             # Load reminders
             try:
                 reminders_ts, reminders_map = load_reminders()
+                print('Loading Reminders...')
             except:
                 reminders_ts, reminders_map = [], {}
+                print('No reminders')
             
             if len(reminders_ts) == 0:
                 continue
@@ -301,11 +303,15 @@ class Scheduler():
                 print('Reminding Now...')
                 meta = reminders_map[reminders_ts[0]] # category, title, type, timestamp
                 
-                await channel.send(f"**Reminder**\n```\n> Content-Type = {meta[2]}\
+                response_string = f"**Reminder**\n```\n> Content-Type = {meta[2]}\
                                                       \n> Title        = {meta[1]}\
                                                       \n> Category     = {meta[0]}\
                                                       \n> Timestamp    = {meta[3]}\
-                                                      \n``` {writer} {designer}")
+                                                      \n``` {writer} {designer}"
+                
+                print(response_string)
+                await channel.send(response_string)
+                
                 remove_save(reminders_ts, reminders_map)
                 
             # If its in the past
