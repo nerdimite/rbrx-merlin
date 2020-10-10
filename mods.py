@@ -299,10 +299,12 @@ class Scheduler():
             # Current timestamp
             now = datetime.now().replace(second=0, microsecond=0) + timedelta(hours=5, minutes=30)
             
+            # Post meta data
+            meta = reminders_map[reminders_ts[0]] # category, title, type, timestamp
+            
             # Check if current time is equal to reminder time
             if now == reminders_ts[0]:
                 print('Reminding Now...')
-                meta = reminders_map[reminders_ts[0]] # category, title, type, timestamp
                 
                 response_string = f"**Reminder**\n```\n> Content-Type = {meta[2]}\
                                                       \n> Title        = {meta[1]}\
