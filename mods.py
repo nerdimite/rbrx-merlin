@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from pytz import timezone
 import asyncio
 
-from utils import parse_args, check_similar
+from utils import *
 
 class Status():
 
@@ -166,24 +166,9 @@ class Status():
         return response_string
 
 
-class Funnel():
+class Scheduler():
 
     def __init__(self):
-        self.scope = ["https://spreadsheets.google.com/feeds",
-                      "https://www.googleapis.com/auth/spreadsheets",
-                      "https://www.googleapis.com/auth/drive.file",
-                      "https://www.googleapis.com/auth/drive"]
-        self.creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", self.scope)
-        self.gclient = gspread.authorize(self.creds)
-
-        self.writers = ['anushk', 'anshita', 'somaditya',
-                        'bhavesh', 'ishaan', 'mriganka',
-                        'nandini', 'piyush', 'dhwaj', 'divya',
-                        'kushagra', 'shreyas', 'rishabh']
-
-        # Load Spreadsheet
-        self.db = self.gclient.open("Content-DB")
-
         # Category shorthands
         self.cat_map = {'fringe': 'Fringe Bureau',
                         'psyche': 'Psyche',
@@ -193,8 +178,8 @@ class Funnel():
                         'inspire': 'Inspire',
                         'yolo': 'YOLO'}
 
-    def add_schedule(self, msg):
-        '''Returns the t_delta of the schedule'''
+    def get_schedule(self, msg):
+        '''Returns the timestamps of the stories and post for a particular post'''
         args = parse_args(msg)
 
         # Convert the args list into a dictionary
@@ -214,11 +199,11 @@ class Funnel():
 
                 # Create timestamps and date strings
                 elif col == 'date':
-                    date_str = f"{val} 10:00"
+                    date_str = f"{val} 11:00"
 
                     post_date = datetime.strptime(date_str, "%d-%m-%Y %H:%M")
-                    s1_date = post_date - timedelta(days=1, hours=-8)
-                    s2_date = post_date + timedelta(hours=4)
+                    s1_date = post_date - timedelta(days=1, hours=-7)
+                    s2_date = post_date + timedelta(hours=3)
 
                     timestamps.extend([s1_date, post_date, s2_date])
 
@@ -239,70 +224,98 @@ class Funnel():
             print(e)
             return "That command doesn't seem right?!", -1, -1
 
-        df = pd.DataFrame(columns=['category', 'title', 'story 1', 'post', 'story 2'])
-        row = df.append(add_info, ignore_index=True).fillna('').values.tolist()[0]
+        values = list(add_info.values())
 
         # Create a formatted response string
-        table = PrettyTable(['Category', 'Title', 'Story 1', 'Post', 'Story 2'])
-        table.add_row(row)
-        response_string = f'**Added to schedule and reminders are set**\n```\n> Category = {row[0]}\
-                                                                            \n> Title    = {row[1]}\
-                                                                            \n> Story 1  = {row[2]}\
-                                                                            \n> Post     = {row[3]}\
-                                                                            \n> Story 2  = {row[4]}\
+        response_string = f'**Added to schedule and reminders are set**\n```\n> Category = {values[0]}\
+                                                                            \n> Title    = {values[1]}\
+                                                                            \n> Story 1  = {values[2]}\
+                                                                            \n> Post     = {values[3]}\
+                                                                            \n> Story 2  = {values[4]}\
                                                                             \n```'
 
-        # Add the row to worksheet
-        sheet = self.db.get_worksheet(1)
-        sheet.append_row(row)
-
-        post_details = (row[0], row[1])
+        post_details = [values[0], values[1]]
 
         return response_string, timestamps, post_details
-
-
-    async def schedule_reminders(self, ctx, timestamps, post_details):
-        '''Starts the reminder timeout'''
-
-        # Writers and Designers role ids for mentioning
-        writer = "<@&747703681985544202>"
-        designer = "<@&747703676587737229>"
-
-        # Post details
-        category, title = post_details
-
+    
+    
+    def get_reminders(self, timestamps, post_details):
+        '''Returns the timestamps of the reminders'''
+        
         # Get the Scheduled timestamps
         s1_t, post_t, s2_t = timestamps
-
+        
         # Create reminder timestamps
         post_r1 = post_t - timedelta(hours=48)
         post_r2 = post_t - timedelta(hours=24)
-        s1_r = s1_t - timedelta(hours=3)
-        s2_r = s2_t - timedelta(hours=3)
+        post_r3 = post_t - timedelta(minutes=30)
+        
+        s1_r1 = s1_t - timedelta(hours=3)
+        s1_r2 = s1_t - timedelta(minutes=30)
+        
+        s2_r1 = s2_t - timedelta(hours=3)
+        s2_r2 = s2_t - timedelta(minutes=30)
+        
+        # Reminders
+        reminders_ts = [post_r1, post_r2, post_r3, s1_r1, s1_r2, s2_r1, s2_r2]
+        
+        meta_data = [['Post', post_t], ['Post', post_t], ['Post', post_t],
+                     ['Story 1', s1_t], ['Story 1', s1_t], ['Story 2', s2_t], ['Story 2', s2_t]]
+        
+        reminders_map = {t: post_details + m for t, m in zip(reminders_ts, meta_data)}
+        
+        
+        return reminders_ts, reminders_map
+        
 
-        # Reminder responses
-        rmdr_resps = [('Post', '48'), ('Post', '24'), ('First Story', '3'), ('Second Story', '3')]
-
-        # Timeline: post_r1 -> post_r2 -> s1_r -> s2_r
-        for rmdr, resps in zip([post_r1, post_r2, s1_r, s2_r], rmdr_resps):
-            # Get the ETA in seconds
-            # now = datetime.now() + timedelta(hours=5, minutes=30)
-            now = datetime.now()
-
-            # Check if now is less than rmdr
-            if now > rmdr:
-                print('rmdr is now in the past, so skipping this rmdr')
+    async def run_scheduler(self, bot):
+        '''Starts the reminder timeout'''
+        print('Running Scheduler...')
+        
+        # Roles and channels for mentioning
+        writer = "<@&747703681985544202>"
+        designer = "<@&747703676587737229>"
+        channel = bot.get_channel(755142334496243892) # publishing channel <#755142334496243892>
+        
+        while(1):
+            # Pre-Sleep
+            await asyncio.sleep(50)
+            
+            # Load reminders
+            try:
+                reminders_ts, reminders_map = load_reminders()
+            except:
+                reminders_ts, reminders_map = [], {}
+            
+            if len(reminders_ts) == 0:
                 continue
-
-            # Get the t_delta in seconds
-            delta = (rmdr - now).seconds + 5
-            # Log
-            print(f'Reminder on {title} at {str(rmdr)} in {delta} seconds')
-            # Sleep
-            await asyncio.sleep(int(delta))
-            # Remind
-            await ctx.channel.send(f"**Reminder:** The {resps[0]} on \"{title}\" ({category}) \
-                                    needs to be published in {resps[1]} Hours. {writer} {designer}")
+            
+            # Sort reminders
+            reminders_ts.sort()
+            
+            # Current timestamp
+            now = datetime.now().replace(second=0, microsecond=0) # + timedelta(hours=5, minutes=30)
+            
+            # Check if current time is equal to reminder time
+            if now == reminders_ts[0]:
+                print('Reminding Now...')
+                meta = reminders_map[reminders_ts[0]] # category, title, type, timestamp
+                
+                await channel.send(f"**Reminder**\n```\n> Content-Type = {meta[2]}\
+                                                      \n> Title        = {meta[1]}\
+                                                      \n> Category     = {meta[0]}\
+                                                      \n> Timestamp    = {meta[3]}\
+                                                      \n``` {writer} {designer}")
+                remove_save(reminders_ts, reminders_map)
+                
+            # If its in the past
+            elif now > reminders_ts[0]:
+                print(f"**Skipping the Reminder**\n```\n> Content-Type = {meta[2]}\
+                                                      \n> Title        = {meta[1]}\
+                                                      \n> Category     = {meta[0]}\
+                                                      \n> Timestamp    = {meta[3]}\
+                                                      \n```")
+                remove_save(reminders_ts, reminders_map)
 
 
     def remind(self, msg):

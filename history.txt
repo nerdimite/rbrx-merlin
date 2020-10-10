@@ -20,3 +20,6 @@ Version 0.3 (06-10-2020)
 Version 0.4 (08-10-2020)
     - Migrated the Code to bot.command extension
     - Migrated the server to raspberry pi
+    
+Version 0.5 (10-10-2020)
+    - Switched to a background coroutine based scheduler

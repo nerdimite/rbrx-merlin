@@ -1,8 +1,9 @@
 import discord
 from discord.ext import commands
 import asyncio
-from mods import Status, Funnel
+from mods import Status, Scheduler
 import os
+from utils import update_reminders
 
 # Init Discord
 intents = discord.Intents.default()
@@ -11,7 +12,11 @@ bot = commands.Bot(command_prefix='--', description="Rubrix's Discord Assistant 
 
 # Init the Mods
 status = Status()
-funnel = Funnel()
+scheduler = Scheduler()
+
+@bot.event
+async def on_ready(): 
+    await scheduler.run_scheduler(bot)
 
 print('Listening...')
 
@@ -37,7 +42,7 @@ async def update(ctx, *, args):
 # ===== Scheduling Commands =====
 @bot.command(aliases=['r'])
 async def remind(ctx, *, args):
-    t_delta, params = funnel.remind(args)
+    t_delta, params = scheduler.remind(args)
         
     if t_delta != -1:
         await ctx.channel.send(f"Will remind you to \"{params['msg']}\" at {params['time']}")
@@ -53,22 +58,28 @@ async def remind(ctx, *, args):
 @bot.command(aliases=['s'])
 async def schedule(ctx, *, args):
     # Add to schedule and extract datetime objects
-    response, timestamps, post_details = funnel.add_schedule(args)
+    response, timestamps, post_details = scheduler.get_schedule(args)
 
     if timestamps != -1 and post_details != -1:
-        await ctx.channel.send(response)
-        # Schedule reminder routines
-        await funnel.schedule_reminders(ctx, timestamps, post_details)
-    else:
-        await ctx.channel.send(response)
+        # Get reminders
+        reminders = scheduler.get_reminders(timestamps, post_details)
+        # Save reminders
+        update_reminders(reminders)
+        
+    await ctx.channel.send(response)
 
 # ===== Experimental Commands =====
-@bot.command(aliases=['exp'])
-async def test(ctx):
+@bot.command(aliases=['ping'])
+async def test(ctx, *, args):
     
     print('Channels:', [x for x in ctx.guild.text_channels if x.name == 'discord-dev'])
+    print('You said {}'.format(args))
     
-    await ctx.channel.send('Check logs')
+    await bot.change_presence(activity=discord.Game(name='Improving myself'))
+    
+    await ctx.channel.send('You said {}'.format(args))
+    
+    
 
 
 
