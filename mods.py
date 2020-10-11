@@ -309,11 +309,10 @@ class Scheduler():
             if now == reminders_ts[0]:
                 print(f'\nReminding Now at {reminders_ts[0]}')
                 
-                response_string = f"**Reminder**\n```\n> Content-Type = {meta[2]}\
-                                                     \n> Title        = {meta[1]}\
-                                                     \n> Category     = {meta[0]}\
-                                                     \n> Publish On   = {meta[3]}\
-                                                     \n``` {writer} {designer}"
+                response_string = f"**Reminder for {meta[2]}**\n```\n> Title        = {meta[1]}\
+                                                                   \n> Category     = {meta[0]}\
+                                                                   \n> Publish On   = {meta[3]}\
+                                                                   \n``` {writer} {designer}"
                 
                 print(response_string)
                 await channel.send(response_string)
