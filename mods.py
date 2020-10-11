@@ -297,10 +297,10 @@ class Scheduler():
             reminders_ts.sort()
             
             print('\n[TS]', reminders_ts)
-            print('\n[MAP]',reminders_map)
+#             print('\n[MAP]',reminders_map)
             
             # Current timestamp
-            now = datetime.now().replace(second=0, microsecond=0) + timedelta(hours=5, minutes=30)
+            now = datetime.now().replace(second=0, microsecond=0)
             
             # Post meta data
             meta = reminders_map[reminders_ts[0]] # category, title, type, timestamp
@@ -348,7 +348,6 @@ class Scheduler():
 
             t_remind = datetime.strptime(args_map['time'], "%d-%m-%Y %H:%M")
             print('t_remind:', t_remind)
-            # now = datetime.now() + timedelta(hours=5, minutes=30)
             now = datetime.now()
             print('now:', now)
             t_delta = (t_remind - now).seconds + 5
