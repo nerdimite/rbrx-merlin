@@ -1,1 +1,0 @@
-worker: python merlin-bot.py
