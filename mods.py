@@ -285,10 +285,10 @@ class Scheduler():
             # Load reminders
             try:
                 reminders_ts, reminders_map = load_reminders()
-                print('Loading Reminders...')
+                print('\nLoading Reminders...')
             except:
                 reminders_ts, reminders_map = [], {}
-                print('No reminders')
+                print('\nNo reminders')
             
             if len(reminders_ts) == 0:
                 continue
@@ -296,7 +296,7 @@ class Scheduler():
             # Sort reminders
             reminders_ts.sort()
             
-            print('\n[TS]', reminders_ts)
+            print('[TS]', reminders_ts)
 #             print('\n[MAP]',reminders_map)
             
             # Current timestamp
