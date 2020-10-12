@@ -410,7 +410,6 @@ class NewsBot():
             
             # Select 2 random members
             members = [member for member in bot.get_guild(self.rubrix_id).members if not member.bot]
-            print(f'Before {len(bot.get_guild(self.rubrix_id).members)} and After {len(members)}')
             select = random.choices(members, k=2)
             
             # Format message
