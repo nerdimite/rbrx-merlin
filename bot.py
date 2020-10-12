@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
-from mods import Status, Scheduler
+from mods import Status, Scheduler, NewsBot
 import os
 from utils import update_reminders
 
@@ -13,12 +13,19 @@ bot = commands.Bot(command_prefix='--', description="Rubrix's Discord Assistant 
 # Init the Mods
 status = Status()
 scheduler = Scheduler()
+newsbot = NewsBot()
 
+# ===== Run Background Tasks =====
 @bot.event
-async def on_ready(): 
-    await scheduler.run_scheduler(bot)
-
-print('Listening...')
+async def on_ready():
+    print('Listening...')
+    # Scheduler
+    scheduler_task = asyncio.create_task(scheduler.run_scheduler(bot))
+    # Newsbot
+    newsbot_task = asyncio.create_task(newsbot.run(bot))
+    
+    await scheduler_task
+    await newsbot_task
 
 # ===== Status Sheet Commands =====
 @bot.command(aliases=['q'])
@@ -68,19 +75,17 @@ async def schedule(ctx, *, args):
         
     await ctx.channel.send(response)
 
+
 # ===== Experimental Commands =====
 @bot.command(aliases=['ping'])
 async def test(ctx, *, args):
     
-    print('Channels:', [x for x in ctx.guild.text_channels if x.name == 'discord-dev'])
-    print('You said {}'.format(args))
+    print('Members', ctx.guild.members)
     
-    await bot.change_presence(activity=discord.Game(name='Improving myself'))
+    print('You said', args)
     
     await ctx.channel.send('You said {}'.format(args))
     
-    
-
 
 
 # =================================

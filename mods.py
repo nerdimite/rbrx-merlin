@@ -9,6 +9,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from prettytable import PrettyTable
 from time import time
 import parse
+import random
 from datetime import datetime, timedelta
 from pytz import timezone
 import asyncio
@@ -356,3 +357,68 @@ class Scheduler():
         except Exception as E:
             print(E)
             return -1, "That command doesn't seem right! Check if the date-time format is correct"
+
+        
+class NewsBot():
+    
+    def __init__(self):
+        self.scope = ["https://spreadsheets.google.com/feeds",
+                      "https://www.googleapis.com/auth/spreadsheets",
+                      "https://www.googleapis.com/auth/drive.file",
+                      "https://www.googleapis.com/auth/drive"]
+        self.creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", self.scope)
+        self.gclient = gspread.authorize(self.creds)
+
+        # Load Spreadsheet
+        self.db = self.gclient.open("Content-DB")
+        self.sheet = self.db.get_worksheet(1)
+        
+        self.channel_ids = {'bot-testing-zone': 755079000962891891, 'discussions': 754337556023345223}
+        self.rubrix_id = 737282578117034004
+        
+    
+    async def run(self, bot):
+        '''Sends a news article link with an optional caption and mentions a user every 24 hours'''
+        print('Running NewsBot...')
+        
+        timings = [datetime.strptime("10:30", "%H:%M").time(), datetime.strptime("19:30", "%H:%M").time()]
+        
+        while(1):
+            # Pre-Sleep
+            await asyncio.sleep(45)
+            
+            # Get the data
+            data = self.sheet.get_all_values()[1:]
+            df = pd.DataFrame(np.array(data), columns=['link', 'caption', 'isDone'])
+            buffer = df[df['isDone'] == ""].T.to_dict()
+            
+            if len(buffer) < 1:
+                print('[NEWSBOT] Links Buffer is Empty!')
+                continue
+            
+            # Current time
+            now = datetime.now().replace(second=0, microsecond=0).time()
+            
+            if now not in timings:
+                print('[NEWSBOT] Ping')
+                continue
+                
+            print('[NEWSBOT] Sharing the article link...')
+            
+            # Get the first article from the buffer
+            idx, info = list(buffer.items())[0]
+            
+            # Select 2 random members
+            members = [member for member in bot.get_guild(self.rubrix_id).members if not member.bot]
+            print(f'Before {len(bot.get_guild(self.rubrix_id).members)} and After {len(members)}')
+            select = random.choices(members, k=2)
+            
+            # Format message
+            message = f"{info['link']} \n{info['caption'] if info['caption'] != '' else f'What are your thoughts?'} <@!{select[0].id}> <@!{select[1].id}>"
+            
+            # Send message
+            channel = bot.get_channel(self.channel_ids['bot-testing-zone'])
+            await channel.send(message)
+            
+            # Update status to done (1)
+            self.sheet.update_cell(idx+2, 3, '1')
