@@ -239,50 +239,50 @@ class Scheduler():
         post_details = [values[0], values[1]]
 
         return response_string, timestamps, post_details
-    
-    
+
+
     def get_reminders(self, timestamps, post_details):
         '''Returns the timestamps of the reminders'''
-        
+
         # Get the Scheduled timestamps
         s1_t, post_t, s2_t = timestamps
-        
+
         # Create reminder timestamps
         post_r1 = post_t - timedelta(hours=48)
         post_r2 = post_t - timedelta(hours=24)
         post_r3 = post_t - timedelta(minutes=30)
-        
+
         s1_r1 = s1_t - timedelta(hours=3)
         s1_r2 = s1_t - timedelta(minutes=30)
-        
+
         s2_r1 = s2_t - timedelta(hours=3)
         s2_r2 = s2_t - timedelta(minutes=30)
-        
+
         # Reminders
         reminders_ts = [post_r1, post_r2, post_r3, s1_r1, s1_r2, s2_r1, s2_r2]
-        
+
         meta_data = [['Post', post_t], ['Post', post_t], ['Post', post_t],
                      ['Story 1', s1_t], ['Story 1', s1_t], ['Story 2', s2_t], ['Story 2', s2_t]]
-        
+
         reminders_map = {t: post_details + m for t, m in zip(reminders_ts, meta_data)}
-        
-        
+
+
         return reminders_ts, reminders_map
-        
+
 
     async def run_scheduler(self, bot):
         '''Starts the reminder timeout'''
         print('Running Scheduler...')
-        
+
         # Roles and channels for mentioning
         writer = "<@&747703681985544202>"
         designer = "<@&747703676587737229>"
         channel = bot.get_channel(755142334496243892) # publishing channel <#755142334496243892>
-        
+
         while(1):
             # Pre-Sleep
             await asyncio.sleep(45)
-            
+
             # Load reminders
             try:
                 reminders_ts, reminders_map = load_reminders()
@@ -290,36 +290,36 @@ class Scheduler():
             except:
                 reminders_ts, reminders_map = [], {}
                 print('\nNo reminders')
-            
+
             if len(reminders_ts) == 0:
                 continue
-            
+
             # Sort reminders
             reminders_ts.sort()
-            
+
             print('[TS]', reminders_ts)
 #             print('\n[MAP]',reminders_map)
-            
+
             # Current timestamp
             now = datetime.now().replace(second=0, microsecond=0)
-            
+
             # Post meta data
             meta = reminders_map[reminders_ts[0]] # category, title, type, timestamp
-            
+
             # Check if current time is equal to reminder time
             if now == reminders_ts[0]:
                 print(f'\nReminding Now at {reminders_ts[0]}')
-                
+
                 response_string = f"**Reminder for {meta[2]}**\n```\n> Title        = {meta[1]}\
                                                                    \n> Category     = {meta[0]}\
                                                                    \n> Publish On   = {meta[3]}\
                                                                    \n``` {writer} {designer}"
-                
+
                 print(response_string)
                 await channel.send(response_string)
-                
+
                 remove_save(reminders_ts, reminders_map)
-                
+
             # If its in the past
             elif now > reminders_ts[0]:
                 print(f"**Skipping the Reminder**\n```\n> Content-Type = {meta[2]}\
@@ -358,9 +358,9 @@ class Scheduler():
             print(E)
             return -1, "That command doesn't seem right! Check if the date-time format is correct"
 
-        
+
 class NewsBot():
-    
+
     def __init__(self):
         self.scope = ["https://spreadsheets.google.com/feeds",
                       "https://www.googleapis.com/auth/spreadsheets",
@@ -372,52 +372,52 @@ class NewsBot():
         # Load Spreadsheet
         self.db = self.gclient.open("Content-DB")
         self.sheet = self.db.get_worksheet(1)
-        
+
         self.channel_ids = {'bot-testing-zone': 755079000962891891, 'discussions': 754337556023345223}
         self.rubrix_id = 737282578117034004
-        
-    
+
+
     async def run(self, bot):
         '''Sends a news article link with an optional caption and mentions a user every 24 hours'''
         print('Running NewsBot...')
-        
+
         timings = [datetime.strptime("10:30", "%H:%M").time(), datetime.strptime("19:30", "%H:%M").time()]
-        
+
         while(1):
             # Pre-Sleep
             await asyncio.sleep(45)
-            
+
             # Get the data
             data = self.sheet.get_all_values()[1:]
             df = pd.DataFrame(np.array(data), columns=['link', 'caption', 'isDone'])
             buffer = df[df['isDone'] == ""].T.to_dict()
-            
+
             if len(buffer) < 1:
                 print('[NEWSBOT] Links Buffer is Empty!')
                 continue
-            
+
             # Current time
             now = datetime.now().replace(second=0, microsecond=0).time()
-            
+
             if now not in timings:
                 print('[NEWSBOT] Ping')
                 continue
-                
+
             print('[NEWSBOT] Sharing the article link...')
-            
+
             # Get the first article from the buffer
             idx, info = list(buffer.items())[0]
-            
+
             # Select 2 random members
             members = [member for member in bot.get_guild(self.rubrix_id).members if not member.bot]
             select = random.choices(members, k=2)
-            
+
             # Format message
             message = f"{info['link']} \n{info['caption'] if info['caption'] != '' else f'What are your thoughts?'} <@!{select[0].id}> <@!{select[1].id}>"
-            
+
             # Send message
-            channel = bot.get_channel(self.channel_ids['bot-testing-zone'])
+            channel = bot.get_channel(self.channel_ids['discussions'])
             await channel.send(message)
-            
+
             # Update status to done (1)
             self.sheet.update_cell(idx+2, 3, '1')
