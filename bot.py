@@ -4,6 +4,7 @@ import asyncio
 from mods import Status, Scheduler, NewsBot
 import os
 from utils import update_reminders
+import random
 
 # Init Discord
 intents = discord.Intents.default()
@@ -82,16 +83,15 @@ async def schedule(ctx, *, args):
 
 
 # ===== Experimental Commands =====
-@bot.command(aliases=['ping'])
-async def test(ctx, *, args):
-    
-    print('Members', ctx.guild.members)
-    
-    print('You said', args)
-    
-    await ctx.channel.send('You said {}'.format(args))
-    
+@bot.command()
+async def echo(ctx, *, args):
+    await ctx.message.delete()
+    await ctx.channel.send(args)
 
+@bot.command()
+async def ping(ctx):
+    resps = ['I am alive!', 'I am here you nerd!', 'Good as new!', 'Online, at your service!']
+    await ctx.channel.send(random.choice(resps))
 
 # =================================
 # Run the bot
