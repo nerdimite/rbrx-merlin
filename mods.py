@@ -420,7 +420,7 @@ class NewsBot():
 
             # Select 2 random members
             members = [member for member in bot.get_guild(self.rubrix_id).members if not member.bot]
-            select = random.choices(members, k=2)
+            select = random.sample(members, k=2)
 
             # Format message
             message = f"{info['link']} \n{info['caption'] if info['caption'] != '' else f'What are your thoughts?'} <@!{select[0].id}> <@!{select[1].id}>"
