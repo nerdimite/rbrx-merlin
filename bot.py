@@ -27,6 +27,11 @@ async def on_ready():
     await scheduler_task
     await newsbot_task
 
+@bot.event
+async def on_member_remove(member):
+    status.member_remove(member)
+    
+
 # ===== Status Sheet Commands =====
 @bot.command(aliases=['q'])
 async def query(ctx, *, args):

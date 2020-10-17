@@ -42,6 +42,13 @@ class Status():
                         'footprints': 'Footprints',
                         'inspire': 'Inspire',
                         'yolo': 'YOLO'}
+        
+    def member_remove(self, member):
+        '''Member Removed/Left'''
+        now = str(datetime.now())
+        sheet = self.db.get_worksheet(2)
+        sheet.append_row([str(member.id), member.name, now])
+        print(f'{member.name} left the server at {now}')
 
 
     def query(self, msg):
