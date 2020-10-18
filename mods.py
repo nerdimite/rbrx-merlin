@@ -42,7 +42,7 @@ class Status():
                         'footprints': 'Footprints',
                         'inspire': 'Inspire',
                         'yolo': 'YOLO'}
-        
+
     def member_remove(self, member):
         '''Member Removed/Left'''
         now = str(datetime.now())
@@ -288,7 +288,7 @@ class Scheduler():
 
         while(1):
             # Pre-Sleep
-            await asyncio.sleep(45)
+            await asyncio.sleep(60)
 
             # Load reminders
             try:
@@ -395,7 +395,7 @@ class NewsBot():
 
         while(1):
             # Pre-Sleep
-            await asyncio.sleep(45)
+            await asyncio.sleep(60)
 
             # Get the data
             data = self.sheet.get_all_values()[1:]
