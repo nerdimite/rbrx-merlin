@@ -388,10 +388,11 @@ class NewsBot():
         '''Sends a news article link with an optional caption and mentions a user every 24 hours'''
         print('Running NewsBot...')
 
-        timings = [datetime.strptime("10:30", "%H:%M").time(),
-                   datetime.strptime("14:00", "%H:%M").time(),
-                   datetime.strptime("18:00", "%H:%M").time(),
-                   datetime.strptime("19:30", "%H:%M").time()]
+        timings = [datetime.strptime("18:00", "%H:%M").time()]
+        # timings = [datetime.strptime("10:30", "%H:%M").time(),
+        #            datetime.strptime("14:00", "%H:%M").time(),
+        #            datetime.strptime("18:00", "%H:%M").time(),
+        #            datetime.strptime("19:30", "%H:%M").time()]
 
         while(1):
             # Pre-Sleep
