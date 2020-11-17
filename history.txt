@@ -26,3 +26,6 @@ Version 0.5 (10-10-2020)
 
 Version 0.6 (13-10-2020)
     - Added NewsBot
+    
+Version 0.7 (17-11-2020)
+    - Added Minecraft Server Control

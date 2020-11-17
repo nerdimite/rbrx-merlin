@@ -5,6 +5,7 @@ from mods import Status, Scheduler, NewsBot
 import os
 from utils import update_reminders
 import random
+import requests
 
 # Init Discord
 intents = discord.Intents.default()
@@ -80,6 +81,16 @@ async def schedule(ctx, *, args):
         update_reminders(reminders)
         
     await ctx.channel.send(response)
+    
+
+@bot.command(aliases=['mc'])
+async def minecraft(ctx, cmd):
+    '''Start or Stop the Rubrix MC SMP Server'''
+    if cmd.lower() not in ['start', 'stop', 'status']:
+        return
+    
+    resp = requests.post('https://at9x4tzxhe.execute-api.us-east-1.amazonaws.com/', json=cmd.lower()).json()
+    await ctx.channel.send(f"`Minecraft Server Status: {resp.capitalize()}`")
 
 
 # ===== Experimental Commands =====
